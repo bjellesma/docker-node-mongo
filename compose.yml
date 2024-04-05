@@ -1,0 +1,29 @@
+services:
+  # name used on the yml can be anything even though this refers to mongodb
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    restart: always
+    # volumes are needed for persistance
+    # not advisable to use ./ for a relative path
+    volumes:
+      - mongo_volume:/data/db
+  app:
+    container_name: docker-node-mongo
+    # if the container fails, it will always restart
+    restart: always
+    build: .
+    # 3000 on local machine maps to 3000 on the app
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo:27017
+      DB_NAME: items
+      NAME: mycontainer
+    # only start after mongo has already started
+    depends_on:
+      - mongo
+# volumes should be whatever storage you've provided up top
+volumes:
+  mongo_volume: {}
